@@ -1,0 +1,7 @@
+com\aromastore\orderservice\service\PedidoService.class
+com\aromastore\orderservice\controller\PedidoController.class
+com\aromastore\orderservice\repository\PedidoRepository.class
+com\aromastore\orderservice\AromaStoreOrderServiceApplication.class
+com\aromastore\orderservice\entity\Pedido.class
+com\aromastore\orderservice\enums\EstadoPedido.class
+com\aromastore\orderservice\config\RabbitMQConfig.class
