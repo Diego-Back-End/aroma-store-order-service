@@ -1,6 +1,7 @@
 package com.aromastore.orderservice.service;
 
 import com.aromastore.orderservice.entity.Pedido;
+import com.aromastore.orderservice.entity.PedidoItem;
 import com.aromastore.orderservice.enums.EstadoPedido;
 import com.aromastore.orderservice.repository.PedidoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -35,15 +37,27 @@ class PedidoServiceTest {
 
     private Pedido testPedido;
 
+    // Método auxiliar para crear un PedidoItem y asociarlo a su pedido
+    private PedidoItem crearItem(Pedido pedido, Long productoId, Integer cantidad, Double precioUnitario) {
+        PedidoItem item = new PedidoItem();
+        item.setProductoId(productoId);
+        item.setCantidad(cantidad);
+        item.setPrecioUnitario(precioUnitario);
+        item.setPedido(pedido);
+        return item;
+    }
+
     @BeforeEach
     void setUp() {
         testPedido = new Pedido();
         testPedido.setId(1L);
         testPedido.setUsuarioId(1L);
-        testPedido.setProductoId(1L);
-        testPedido.setCantidad(2);
         testPedido.setTotal(199.98);
         testPedido.setEstado(EstadoPedido.PENDIENTE);
+
+        List<PedidoItem> items = new ArrayList<>();
+        items.add(crearItem(testPedido, 1L, 2, 99.99));
+        testPedido.setItems(items);
     }
 
     @Test
@@ -52,10 +66,12 @@ class PedidoServiceTest {
         Pedido savedPedido = new Pedido();
         savedPedido.setId(1L);
         savedPedido.setUsuarioId(1L);
-        savedPedido.setProductoId(1L);
-        savedPedido.setCantidad(2);
         savedPedido.setTotal(199.98);
         savedPedido.setEstado(EstadoPedido.PENDIENTE);
+
+        List<PedidoItem> items = new ArrayList<>();
+        items.add(crearItem(savedPedido, 1L, 2, 99.99));
+        savedPedido.setItems(items);
 
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(savedPedido);
 
@@ -76,10 +92,12 @@ class PedidoServiceTest {
         Pedido savedPedido = new Pedido();
         savedPedido.setId(1L);
         savedPedido.setUsuarioId(1L);
-        savedPedido.setProductoId(1L);
-        savedPedido.setCantidad(2);
         savedPedido.setTotal(199.98);
         savedPedido.setEstado(EstadoPedido.PENDIENTE);
+
+        List<PedidoItem> items = new ArrayList<>();
+        items.add(crearItem(savedPedido, 1L, 2, 99.99));
+        savedPedido.setItems(items);
 
         when(pedidoRepository.save(any(Pedido.class))).thenReturn(savedPedido);
 
@@ -128,10 +146,12 @@ class PedidoServiceTest {
         Pedido pedido2 = new Pedido();
         pedido2.setId(2L);
         pedido2.setUsuarioId(1L);
-        pedido2.setProductoId(2L);
-        pedido2.setCantidad(1);
         pedido2.setTotal(99.99);
         pedido2.setEstado(EstadoPedido.PENDIENTE);
+
+        List<PedidoItem> items2 = new ArrayList<>();
+        items2.add(crearItem(pedido2, 2L, 1, 99.99));
+        pedido2.setItems(items2);
 
         when(pedidoRepository.findByUsuarioId(usuarioId)).thenReturn(Arrays.asList(testPedido, pedido2));
 
@@ -152,10 +172,12 @@ class PedidoServiceTest {
         Pedido pedido2 = new Pedido();
         pedido2.setId(2L);
         pedido2.setUsuarioId(2L);
-        pedido2.setProductoId(1L);
-        pedido2.setCantidad(1);
         pedido2.setTotal(99.99);
         pedido2.setEstado(EstadoPedido.PENDIENTE);
+
+        List<PedidoItem> items2 = new ArrayList<>();
+        items2.add(crearItem(pedido2, 1L, 1, 99.99));
+        pedido2.setItems(items2);
 
         when(pedidoRepository.findAll()).thenReturn(Arrays.asList(testPedido, pedido2));
 
