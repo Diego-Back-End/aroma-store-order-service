@@ -89,20 +89,19 @@ public class PedidoService {
         return "Usuario"; // Fallback si falla la llamada
     }
     
-    // Método encargado de publicar el evento en RabbitMQ
     private void publishPedidoEvent(Pedido pedido) {
+    String nombreUsuario = obtenerNombreUsuario(pedido.getUsuarioId());
 
-        // Obtiene el nombre del usuario
-        String nombreUsuario = obtenerNombreUsuario(pedido.getUsuarioId());
+    String message = String.format(
+        "Nuevo pedido creado - ID: %d, Usuario: %d, Nombre: %s, Items: %d productos, Total: %.2f, Estado: %s",
+        pedido.getId(), pedido.getUsuarioId(), nombreUsuario, pedido.getItems().size(),
+        pedido.getTotal(), pedido.getEstado()
+    );
 
-        // Construye el mensaje con la información del pedido
-        String message = String.format(
-            "Nuevo pedido creado - ID: %d, Usuario: %d, Nombre: %s, Items: %d productos, Total: %.2f, Estado: %s",
-            pedido.getId(), pedido.getUsuarioId(), nombreUsuario, pedido.getItems().size(),
-            pedido.getTotal(), pedido.getEstado()
-        );
-        
-        // Envía el mensaje a la cola "pedidos-queue"
+    try {
         rabbitTemplate.convertAndSend("pedidos-queue", message);
+    } catch (Exception e) {
+        logger.warn("No se pudo publicar el evento de pedido en RabbitMQ: {}", e.getMessage());
     }
+}
 }
